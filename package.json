@@ -1,0 +1,13 @@
+{
+	"name": "mai-load-more",
+	"version": "0.1.0",
+	"description": "Mai Load More plugin build process",
+	"scripts": {
+		"build": "wp-scripts build src/mai-load-more.js",
+		"start": "wp-scripts start src/mai-load-more.js",
+		"packages-update": "wp-scripts packages-update"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^30.20.0"
+	}
+}
