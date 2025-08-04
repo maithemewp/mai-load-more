@@ -20,7 +20,14 @@ class Archive extends LoadMore {
 	 * @return bool
 	 */
 	public function should_run( $args ) {
-		return 'archive' === ( $args['params']['args']['context'] ?? '' );
+		if ( 'archive' !== ( $args['params']['args']['context'] ?? '' ) ) {
+			return false;
+		}
+
+		// Allow filtering if the load more functionality should run.
+		$should_run = apply_filters( 'mai_load_more_archive_should_run', false, $args );
+
+		return (bool)$should_run;
 	}
 
 	/**
