@@ -43,14 +43,14 @@ class Archive extends LoadMore {
 		global $wp_query;
 
 		$data = [
-			'type'           => $args['params']['args']['type'] ?? 'post',
-			'template'       => \mai_get_template_args(),
-			'query'          => $wp_query->query_vars,
-			'page'           => max( $wp_query->query_vars['paged'], 1 ),
-			'total_posts'    => $wp_query->found_posts,
-			'max_num_pages'  => $wp_query->max_num_pages,
-			'no_posts_text'  => $this->args['no_posts_text'],
-			'no_posts_class' => $this->args['no_posts_class'],
+			'type'             => $args['params']['args']['type'] ?? 'post',
+			'template'         => \mai_get_template_args(),
+			'query'            => $wp_query->query_vars,
+			'page'             => max( $wp_query->query_vars['paged'], 1 ),
+			'total_entries'    => $wp_query->found_posts,
+			'total_pages'      => $wp_query->max_num_pages,
+			'no_entries_text'  => $this->args['no_entries_text'],
+			'no_entries_class' => $this->args['no_entries_class'],
 		];
 
 		return $data;

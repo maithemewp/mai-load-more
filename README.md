@@ -69,7 +69,7 @@ You can customize the load more button appearance and behavior using WordPress f
 add_filter( 'mai_load_more_args', function( $args ) {
 	$args['button_text']         = 'Load More Posts';
 	$args['button_text_loading'] = 'Loading...';
-	$args['no_posts_text']       = 'No more posts available';
+	$args['no_entries_text']     = 'No more posts available';
 	$args['button_class']        = 'button button-secondary';
 
 	return $args;
@@ -84,8 +84,8 @@ add_filter( 'mai_load_more_args', function( $args ) {
 | `button_class` | `'button'` | CSS classes for the load more button |
 | `button_text` | `'Load More'` | Text displayed on the button |
 | `button_text_loading` | SVG spinner | Content shown during loading |
-| `no_posts_text` | `'No more posts to show'` | Text when no more posts are available |
-| `no_posts_class` | `'mai-no-posts'` | CSS class for no posts message |
+| `no_entries_text` | `'No more entries to show'` | Text when no more entries are available |
+| `no_entries_class` | `'mai-no-entrie'` | CSS class for no entries message |
 
 ## Development
 
