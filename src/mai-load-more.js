@@ -32,12 +32,15 @@
 			// Set up query parameters.
 			query.paged = nextPage;
 
+			// Determine if this is a term query or post query.
+			const action = 'term' === container.dataset.type ? 'mai_load_more_terms' : 'mai_load_more_posts';
+
 			// Build data for AJAX request.
 			const data = new FormData();
-			data.append('action', 'mai_load_more_posts');
+			data.append('action', action);
 			data.append('query_args', JSON.stringify(query));
 			data.append('template_args', JSON.stringify(template));
-			data.append('total_posts', container.dataset.totalPosts);
+			data.append('total_entries', container.dataset.totalEntries);
 			data.append('nonce', maiLoadMore.nonce);
 
 			// Make AJAX request.
@@ -62,9 +65,9 @@
 
 					// Check if there are more posts to load.
 					if (!data.data.has_more) {
-						// Show "no more posts" message if configured.
-						if (container.dataset.noposts && entries) {
-							container.querySelector('.entries-wrap')?.insertAdjacentHTML('afterEnd', `<p class="${container.dataset.nopostsClass}">${container.dataset.noposts}</p>`);
+						// Show "no more entries" message if configured.
+						if (container.dataset.noentries && entries) {
+							container.querySelector('.entries-wrap')?.insertAdjacentHTML('afterEnd', `<p class="${container.dataset.noentriesClass}">${container.dataset.noentries}</p>`);
 						}
 						// Remove the button since there are no more posts.
 						this.remove();

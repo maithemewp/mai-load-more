@@ -27,7 +27,7 @@ class Archive extends LoadMore {
 		// Allow filtering if the load more functionality should run.
 		$should_run = apply_filters( 'mai_load_more_archive_should_run', false, $args );
 
-		return (bool)$should_run;
+		return (bool) $should_run;
 	}
 
 	/**
@@ -42,15 +42,18 @@ class Archive extends LoadMore {
 	public function get_data( $args ) {
 		global $wp_query;
 
-		return [
-			'template'        => \mai_get_template_args(),
-			'query'           => $wp_query->query_vars,
-			'page'            => max( $wp_query->query_vars['paged'], 1 ),
-			'total_posts'     => $wp_query->found_posts,
-			'max_num_pages'   => $wp_query->max_num_pages,
-			'no_posts_text'   => $this->args['no_posts_text'],
-			'no_posts_class'  => $this->args['no_posts_class'],
+		$data = [
+			'type'           => $args['params']['args']['type'] ?? 'post',
+			'template'       => \mai_get_template_args(),
+			'query'          => $wp_query->query_vars,
+			'page'           => max( $wp_query->query_vars['paged'], 1 ),
+			'total_posts'    => $wp_query->found_posts,
+			'max_num_pages'  => $wp_query->max_num_pages,
+			'no_posts_text'  => $this->args['no_posts_text'],
+			'no_posts_class' => $this->args['no_posts_class'],
 		];
+
+		return $data;
 	}
 
 	/**

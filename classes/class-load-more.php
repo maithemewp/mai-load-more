@@ -83,8 +83,8 @@ class LoadMore {
 			'button_class'        => 'button',
 			'button_text'         => __( 'Load More', 'mai-engine' ),
 			'button_text_loading' => '<svg style="animation:mailoadmorespin 2s linear infinite;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-loader"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6l0 -3" /><path d="M16.25 7.75l2.15 -2.15" /><path d="M18 12l3 0" /><path d="M16.25 16.25l2.15 2.15" /><path d="M12 18l0 3" /><path d="M7.75 16.25l-2.15 2.15" /><path d="M6 12l-3 0" /><path d="M7.75 7.75l-2.15 -2.15" /></svg>',
-			'no_posts_text'       => __( 'No more posts to show', 'mai-engine' ),
-			'no_posts_class'      => 'mai-no-posts',
+			'no_entries_text'     => __( 'No more entries to show', 'mai-engine' ),
+			'no_entries_class'    => 'mai-no-entries has-md-margin-top has-text-align-center',
 		];
 
 		$this->args = apply_filters( 'mai_load_more_args', $args );
@@ -171,19 +171,25 @@ class LoadMore {
 		// Get context-specific data.
 		$this->data = $this->get_data( $args );
 
+		// Sanitize the data.
+		$this->data = $this->sanitize_data( $this->data );
+
 		// Bail if data validation fails.
 		if ( ! $this->validate_data( $this->data ) ) {
 			return $attr;
 		}
 
 		// Add the data attributes.
-		$attr['data-load-more']     = 'true';
-		$attr['data-template']      = esc_attr( base64_encode( wp_json_encode( $this->data['template'] ) ) );
-		$attr['data-query']         = esc_attr( base64_encode( wp_json_encode( $this->data['query'] ) ) );
-		$attr['data-page']          = esc_attr( $this->data['page'] );
-		$attr['data-total-posts']   = esc_attr( $this->data['total_posts'] );
-		$attr['data-noposts']       = esc_attr( $this->data['no_posts_text'] );
-		$attr['data-noposts-class'] = esc_attr( $this->data['no_posts_class'] );
+		$attr['data-load-more']       = 'true';
+		$attr['data-type']            = esc_attr( $this->data['type'] );
+		$attr['data-template']        = esc_attr( base64_encode( wp_json_encode( $this->data['template'] ) ) );
+		$attr['data-query']           = esc_attr( base64_encode( wp_json_encode( $this->data['query'] ) ) );
+		$attr['data-page']            = esc_attr( $this->data['page'] );
+		$attr['data-total-entries']   = esc_attr( $this->data['total_entries'] );
+		$attr['data-noentries']       = esc_attr( $this->data['no_entries_text'] );
+		$attr['data-noentries-class'] = esc_attr( $this->data['no_entries_class'] );
+
+		ray( $attr );
 
 		// Add the button.
 		add_filter( 'genesis_markup_entries_close', [ $this, 'add_button' ], 10, 2 );
@@ -208,7 +214,7 @@ class LoadMore {
 		}
 
 		// Bail if there are no more pages.
-		if ( $this->data['max_num_pages'] <= 1 ) {
+		if ( $this->data['total_pages'] <= 1 ) {
 			return $content;
 		}
 
@@ -238,10 +244,10 @@ class LoadMore {
 			'template',
 			'query',
 			'page',
-			'total_posts',
-			'max_num_pages',
-			'no_posts_text',
-			'no_posts_class',
+			'total_entries',
+			'total_pages',
+			'no_entries_text',
+			'no_entries_class',
 		];
 
 		foreach ( $required_keys as $key ) {
@@ -251,5 +257,102 @@ class LoadMore {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Sanitize all data.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array $data The data to sanitize.
+	 *
+	 * @return array Sanitized data.
+	 */
+	protected function sanitize_data( $data ) {
+		if ( ! is_array( $data ) ) {
+			return $data;
+		}
+
+		$sanitized = [];
+
+		foreach ( $data as $key => $value ) {
+			switch ( $key ) {
+				case 'template':
+					$sanitized[ $key ] = $this->sanitize_template_args( $value );
+					break;
+				case 'query':
+					$sanitized[ $key ] = $this->sanitize_query_vars( $value );
+					break;
+				case 'page':
+				case 'total_entries':
+				case 'total_pages':
+					$sanitized[ $key ] = (int) $value;
+					break;
+				case 'no_entries_text':
+					$sanitized[ $key ] = sanitize_text_field( $value );
+					break;
+				case 'no_entries_class':
+					$classes           = explode( ' ', $value );
+					$classes           = array_map( 'sanitize_html_class', $classes );
+					$classes           = array_filter( $classes );
+					$sanitized[ $key ] = implode( ' ', $classes );
+					break;
+				default:
+					$sanitized[ $key ] = $value;
+					break;
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize template arguments.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array $template_args The template arguments.
+	 *
+	 * @return array Sanitized template arguments.
+	 */
+	protected function sanitize_template_args( $template_args ) {
+		$sanitized = [];
+
+		foreach ( $template_args as $key => $value ) {
+			if ( is_string( $value ) ) {
+				$sanitized[ $key ] = sanitize_text_field( $value );
+			} elseif ( is_array( $value ) ) {
+				$sanitized[ $key ] = $this->sanitize_template_args( $value );
+			} else {
+				$sanitized[ $key ] = $value;
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize query variables.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array $query_vars The query variables.
+	 *
+	 * @return array Sanitized query variables.
+	 */
+	protected function sanitize_query_vars( $query_vars ) {
+		$sanitized = [];
+
+		foreach ( $query_vars as $key => $value ) {
+			if ( is_string( $value ) ) {
+				$sanitized[ $key ] = sanitize_text_field( $value );
+			} elseif ( is_array( $value ) ) {
+				$sanitized[ $key ] = $this->sanitize_query_vars( $value );
+			} else {
+				$sanitized[ $key ] = $value;
+			}
+		}
+
+		return $sanitized;
 	}
 }

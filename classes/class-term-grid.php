@@ -2,18 +2,20 @@
 
 namespace Mai\LoadMore;
 
+use WP_Term_Query;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
- * The Post Grid class.
+ * The Term Grid class.
  *
- * @since 0.1.0
+ * @since 0.2.0
  */
-class PostGrid extends LoadMore {
+class TermGrid extends LoadMore {
 	/**
 	 * Check if this class should run.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 *
 	 * @param array $args The args from genesis_{*} filters.
 	 *
@@ -26,13 +28,13 @@ class PostGrid extends LoadMore {
 		$classes = array_filter( $classes );
 		$classes = array_flip( $classes );
 
-		return 'post' === $type && 'block' === $context && isset( $classes['mai-grid-load-more'] );
+		return 'term' === $type && 'block' === $context && isset( $classes['mai-grid-load-more'] );
 	}
 
 	/**
-	 * Get load more data for post grid context.
+	 * Get load more data for term grid context.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 *
 	 * @param array $args The args from genesis_{*} filters.
 	 *
@@ -48,16 +50,18 @@ class PostGrid extends LoadMore {
 		}
 
 		// Get pagination info from the query object.
-		$total_pages  = $query->max_num_pages;
-		$found_posts  = $query->found_posts;
-		$current_page = max( $query->get( 'paged' ), 1 );
+		$taxonomy     = $query->query_vars['taxonomy'][0] ?? '';
+		$found_terms  = wp_count_terms($taxonomy, $query->query_vars);
+		$number       = $query->query_vars['number'] ?? 10;
+		$current_page = max( $query->query_vars['paged'] ?? 1, 1 );
+		$total_pages  = $number > 0 ? ceil( $found_terms / $number ) : 0;
 
 		$data = [
-			'type'              => $args['params']['args']['type'] ?? 'post',
+			'type'              => $args['params']['args']['type'] ?? 'term',
 			'template'          => $template_args,
 			'query'             => $query->query_vars,
 			'page'              => $current_page,
-			'total_entries'     => $found_posts,
+			'total_entries'     => $found_terms,
 			'total_pages'       => $total_pages,
 			'no_entries_text'   => $this->args['no_entries_text'],
 			'no_entries_class'  => $this->args['no_entries_class'],
