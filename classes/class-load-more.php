@@ -189,8 +189,6 @@ class LoadMore {
 		$attr['data-noentries']       = esc_attr( $this->data['no_entries_text'] );
 		$attr['data-noentries-class'] = esc_attr( $this->data['no_entries_class'] );
 
-		ray( $attr );
-
 		// Add the button.
 		add_filter( 'genesis_markup_entries_close', [ $this, 'add_button' ], 10, 2 );
 
