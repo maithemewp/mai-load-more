@@ -4,7 +4,7 @@
  * Plugin Name:       Mai Load More
  * Plugin URI:        https://bizbudding.com
  * Description:       Load more posts functionality for Mai Theme.
- * Version:           0.3.0
+ * Version:           0.4.0
  * Requires PHP:      8.2
  * Requires at least: 6.8
  *
