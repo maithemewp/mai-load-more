@@ -30,6 +30,15 @@ class LoadMore {
 	public $data;
 
 	/**
+	 * Entries index.
+	 *
+	 * @since TBD
+	 *
+	 * @var int
+	 */
+	public $index;
+
+	/**
 	 * Check if this class should run.
 	 * This must be overridden in the child class.
 	 *
@@ -179,6 +188,9 @@ class LoadMore {
 			return $attr;
 		}
 
+		// Set the index.
+		$this->index = $args['params']['args']['index'] ?? 0;
+
 		// Add the data attributes.
 		$attr['data-load-more']       = 'true';
 		$attr['data-type']            = esc_attr( $this->data['type'] );
@@ -211,6 +223,16 @@ class LoadMore {
 			return $content;
 		}
 
+		$index = $args['params']['args']['index'] ?? 0;
+
+		// Bail if the index is not the same.
+		if ( $index !== $this->index ) {
+			return $content;
+		}
+
+		// Remove the filters so they don't run again.
+		remove_filter( 'genesis_markup_entries_close', [ $this, 'add_button' ], 10, 2 );
+
 		// Bail if there are no more pages.
 		if ( $this->data['total_pages'] <= 1 ) {
 			return $content;
@@ -221,9 +243,6 @@ class LoadMore {
 		$button .= sprintf( '<p class="%s">', esc_attr( $this->args['button_wrap_class'] ) );
 		$button .= sprintf( '<button class="%s">%s</button>', esc_attr( trim( 'mai-load-more ' . $this->args['button_class'] ) ), esc_html( $this->args['button_text'] ) );
 		$button .= '</p>';
-
-		// Remove the filter so it doesn't run again.
-		remove_filter( 'genesis_markup_entries_close', [ $this, 'add_button' ], 10, 2 );
 
 		return $button . $content;
 	}
