@@ -74,7 +74,7 @@ class Archive extends LoadMore {
 	 */
 	private function get_archive_query_args( $wp_query ) {
 		return array_filter( $wp_query->query_vars, function( $value ) {
-			if ( '' === $value || 0 === $value || false === $value ) {
+			if ( '' === $value ) {
 				return false;
 			}
 
