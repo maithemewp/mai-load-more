@@ -25,7 +25,6 @@ require_once __DIR__ . '/classes/class-ajax.php';
 require_once __DIR__ . '/classes/class-archive.php';
 require_once __DIR__ . '/classes/class-post-grid.php';
 require_once __DIR__ . '/classes/class-term-grid.php';
-require_once __DIR__ . '/classes/class-slider.php';
 
 // Initialize the classes.
 new Ajax();
@@ -47,7 +46,6 @@ function init() {
 	new Archive();
 	new PostGrid();
 	new TermGrid();
-	new Slider();
 }
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\updater' );
