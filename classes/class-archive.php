@@ -82,19 +82,21 @@ class Archive extends LoadMore {
 		// e.g. ['author_name' => 'john'] or ['category_name' => 'news'].
 		$query = $wp_query->query;
 
-		// Get WP_Query defaults to identify vars customized by pre_get_posts, etc.
-		$defaults = ( new \WP_Query() )->fill_query_vars( [] );
-
-		// Add any query_vars that differ from defaults and aren't already
-		// in the URL-derived query (avoids redundant resolved values).
+		// Add any non-default query_vars that aren't already in the URL query.
+		// This captures pre_get_posts customizations (posts_per_page, meta_query, etc.)
+		// while avoiding redundant resolved values (e.g. author when author_name exists).
 		foreach ( $wp_query->query_vars as $key => $value ) {
 			// Already in the URL query — skip to avoid redundancy.
 			if ( isset( $query[ $key ] ) ) {
 				continue;
 			}
 
-			// Matches the default — not meaningful.
-			if ( array_key_exists( $key, $defaults ) && $defaults[ $key ] === $value ) {
+			// Skip empty defaults (strings, arrays, zero, false).
+			if ( '' === $value || 0 === $value || false === $value ) {
+				continue;
+			}
+
+			if ( is_array( $value ) && empty( $value ) ) {
 				continue;
 			}
 
