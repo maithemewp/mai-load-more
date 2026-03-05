@@ -61,49 +61,29 @@ class Archive extends LoadMore {
 	}
 
 	/**
-	 * Build query args from the main query for AJAX reuse.
+	 * Filter query vars to only meaningful, non-default values.
 	 *
-	 * Uses $wp_query->query (the original URL-derived params like author_name,
-	 * category_name, s, etc.) as the base, then adds any non-default query_vars
-	 * that were set by pre_get_posts or the theme (like posts_per_page, meta_query).
+	 * The full query_vars array has 100+ keys with empty defaults.
+	 * Filtering to non-empty values produces a clean set for AJAX reuse.
 	 *
-	 * This avoids sending the full 100+ key query_vars array which includes
-	 * both original params AND internally-resolved values (e.g. author_name AND
-	 * author), causing redundant/conflicting processing in the AJAX WP_Query.
-	 *
-	 * @since TBD
+	 * @since 0.4.1
 	 *
 	 * @param \WP_Query $wp_query The main query object.
 	 *
-	 * @return array Query arguments for AJAX reuse.
+	 * @return array Filtered query arguments.
 	 */
 	private function get_archive_query_args( $wp_query ) {
-		// Start with the original URL-derived query params.
-		// e.g. ['author_name' => 'john'] or ['category_name' => 'news'].
-		$query = $wp_query->query;
-
-		// Add any non-default query_vars that aren't already in the URL query.
-		// This captures pre_get_posts customizations (posts_per_page, meta_query, etc.)
-		// while avoiding redundant resolved values (e.g. author when author_name exists).
-		foreach ( $wp_query->query_vars as $key => $value ) {
-			// Already in the URL query — skip to avoid redundancy.
-			if ( isset( $query[ $key ] ) ) {
-				continue;
-			}
-
-			// Skip empty defaults (strings, arrays, zero, false).
+		return array_filter( $wp_query->query_vars, function( $value ) {
 			if ( '' === $value || 0 === $value || false === $value ) {
-				continue;
+				return false;
 			}
 
 			if ( is_array( $value ) && empty( $value ) ) {
-				continue;
+				return false;
 			}
 
-			$query[ $key ] = $value;
-		}
-
-		return $query;
+			return true;
+		});
 	}
 
 	/**
