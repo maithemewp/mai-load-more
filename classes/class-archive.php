@@ -94,8 +94,10 @@ class Archive extends LoadMore {
 	 * @return void
 	 */
 	public function hooks() {
-		// Remove pagination.
+		// Remove pagination. Mai Engine's mai_posts_nav (priority 9) normally removes
+		// genesis_posts_nav (priority 10) at runtime, so both must be explicitly removed.
 		remove_action( 'genesis_after_endwhile',                 'mai_posts_nav', 9 );
+		remove_action( 'genesis_after_endwhile',                 'genesis_posts_nav' );
 		add_filter( 'genesis_markup_archive-pagination_open',    '__return_empty_string' );
 		add_filter( 'genesis_markup_archive-pagination_content', '__return_empty_string' );
 		add_filter( 'genesis_markup_archive-pagination_close',   '__return_empty_string' );

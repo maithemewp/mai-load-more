@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2 (2026-04-03)
+
+* Fixed: Remove genesis_posts_nav alongside mai_posts_nav to prevent unstyled fallback pagination from rendering below the load more button.
+
 ## 0.4.1 (2026-03-05)
 
 * Fixed: Load more on author archives now correctly loads posts from the author instead of all posts.
