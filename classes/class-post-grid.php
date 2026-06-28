@@ -30,6 +30,44 @@ class PostGrid extends LoadMore {
 	}
 
 	/**
+	 * Register hooks. Runs once at construction (template_redirect), before any grid builds its
+	 * query, so the found-rows filter is in place in time.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	public function run() {
+		parent::run();
+		add_filter( 'mai_post_grid_query_args', [ $this, 'restore_found_rows' ], 10, 2 );
+	}
+
+	/**
+	 * Restore found-rows counting for load-more post grids.
+	 *
+	 * Mai Engine defaults grids to `no_found_rows` for speed, but load-more needs an accurate
+	 * `found_posts` / `max_num_pages` on the initial render to know how many pages exist. Opt the
+	 * grid back into the count when it carries the `mai-grid-load-more` class (the same marker
+	 * `should_run()` keys on).
+	 *
+	 * @since TBD
+	 *
+	 * @param array $query_args The grid query args.
+	 * @param array $args       The Mai_Grid block args.
+	 *
+	 * @return array
+	 */
+	public function restore_found_rows( $query_args, $args ) {
+		$classes = array_filter( explode( ' ', $args['class'] ?? '' ) );
+
+		if ( in_array( 'mai-grid-load-more', $classes, true ) ) {
+			$query_args['no_found_rows'] = false;
+		}
+
+		return $query_args;
+	}
+
+	/**
 	 * Get load more data for post grid context.
 	 *
 	 * @since 0.1.0

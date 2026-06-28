@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3
+
+* Fixed: The Load More button no longer appears under Mai Post Grid on Mai Engine 2.40.0+, where grids now default to `no_found_rows` for speed. Load-more grids now opt back into the post count so the initial render has accurate pagination totals; subsequent AJAX page loads stay optimized.
+
 ## 0.4.2 (2026-04-03)
 
 * Fixed: Remove genesis_posts_nav alongside mai_posts_nav to prevent unstyled fallback pagination from rendering below the load more button.
